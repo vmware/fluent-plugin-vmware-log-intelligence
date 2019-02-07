@@ -1,0 +1,103 @@
+= Overview
+
+vmware_log_intelligence is a Fluentd output plugin that buffers data and sends the data to VMware Log Intelligence.
+
+== Requirements
+
+fluentd version: 0.14.0 or above
+
+Ruby version: 2.2 or above
+
+== Installation
+
+`gem install fluent-plugin-vmware-log-ingelligence`
+
+== Usage
+vmware_log_intelligence does not support Fluentd v0.12 style configurations.
+Please use Fluentd v1.0 style configurations when working with the plugin.
+
+Here is an example of the vmware_log_intelligence plugin configurations:
+
+```
+<match pattern>
+  @type vmware_log_intelligence
+  endpoint_url https://data.upgrade.symphony-dev.com/le-mans/v1/streams/ingestion-pipeline-stream
+  verify_ssl false
+  <headers>
+    Content-Type application/json
+    Authorization Bearer Your-VMware-Log-Intelligence-API-Token
+    structure simple
+  </headers>
+  <buffer>
+    chunk_limit_records 300
+    flush_interval 3s
+    retry_max_times 3
+  </buffer>
+</match>
+```
+
+You can find more configuration examples in the files under the examples folder.
+
+Besides Fluentd, you can also use the plugin with td-agent.
+
+== Configuration
+
+=== endpoint_url
+This is the URL to which you want to send the logs to. You should set it to the URL of VMware Log Intelligence:
+https://data.upgrade.symphony-dev.com/le-mans/v1/streams/ingestion-pipeline-stream
+
+=== verify_ssl
+You can use this setting to control whether the vmware_log_intelligence plugin should verify
+the SSL certificate of the endpoint_url. You should always set this to `true` except in testing
+or troubleshooting.
+
+=== <headers>
+In order to send logs to VMware Log Intelligence, you need to have the `<headers>`
+section in your configuration. The `<headers>` section should look like the following:
+
+```
+<headers>
+  Content-Type application/json
+  Authorization Bearer Your-VMware-Log-Intelligence-API-Token
+  structure simple
+</headers>
+```
+
+=== <buffer>
+The vmware_log_intelligence plugin supports buffering. All the buffering configurations
+of Fluentd are supported. Detailed information of the buffering configurations can be
+found here https://docs.fluentd.org/v1.0/articles/buffer-section.
+
+== Run tests
+If you would like to contribute to this project, you might want to be able to run the tests
+under the `test` folder. You can do that in a Ruby environment you have set up on your dev
+machine. You can also run the tests in a Docker container. To run the tests in a Docker container,
+you can follow these steps:
+
+Go to the root folder of this project and build the Docker image like this:
+`docker build -t fluent-plugin-dev .`
+
+Run the container like this:
+`docker run --rm -i -t --name fluent-plugin-dev -v $(pwd):/app fluent-plugin-dev /bin/bash`
+
+Once inside the container, you can run the following to make sure that all dependecies are installed:
+`bundle install`
+
+Then you can run tests like this:
+`bundle exec rake`
+
+== Contributing
+The vmware_log_intelligence plugin project team welcomes contributions from the community.
+Before you start working with fluent-plugin-vmware-log-ingelligence, please read our
+[Developer Certificate of Origin](https://cla.vmware.com/dco). All contributions to this repository must be signed as described
+on that page. Your signature certifies that you wrote the patch or have the right to pass it on
+as an open-source patch. For more detailed information, refer to [CONTRIBUTING.md](CONTRIBUTING.md).
+
+== License
+Please see [LICENSE.txt](LICENSE.txt).
+
+== Copyright
+
+Copyright (c) 2013 ablagoev.
+
+Copyright 2018 VMware, Inc.
