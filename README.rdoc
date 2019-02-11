@@ -83,11 +83,7 @@ Then you can run tests like this:
 `bundle exec rake`
 
 == Contributing
-The vmware_log_intelligence plugin project team welcomes contributions from the community.
-Before you start working with fluent-plugin-vmware-log-ingelligence, please read our
-Developer Certificate of Origin (https://cla.vmware.com/dco). All contributions to this repository must be signed as described
-on that page. Your signature certifies that you wrote the patch or have the right to pass it on
-as an open-source patch. For more detailed information, refer to CONTRIBUTING.md[CONTRIBUTING.md].
+The vmware_log_intelligence plugin project team welcomes contributions from the community. Before you start working with fluent-plugin-vmware-log-intelligence, please read our [Developer Certificate of Origin](https://cla.vmware.com/dco). All contributions to this repository must be signed as described on that page. Your signature certifies that you wrote the patch or have the right to pass it on as an open-source patch. For more detailed information, refer to [CONTRIBUTING.md](CONTRIBUTING.md).
 
 == License
 Please see LICENSE.txt[LICENSE.txt].
