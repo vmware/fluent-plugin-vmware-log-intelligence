@@ -8,9 +8,11 @@ fluentd version: 0.14.0 or above
 
 Ruby version: 2.2 or above
 
-== Installation
+== Build and install the plugin
 
-`gem install fluent-plugin-vmware-log-ingelligence`
+`gem build fluent-plugin-vmware-log-intelligence.gemspec`
+
+`gem install fluent-plugin-vmware-log-intelligence-1.0.0.gem`
 
 == Usage
 vmware_log_intelligence does not support Fluentd v0.12 style configurations.
