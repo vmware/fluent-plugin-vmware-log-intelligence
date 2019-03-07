@@ -1,4 +1,4 @@
-FROM ruby:2.5-alpine
+FROM ruby:2.5
 MAINTAINER gwu@vmware.com
 
 RUN apt-get update && apt-get install -y \ 
