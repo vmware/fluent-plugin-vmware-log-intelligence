@@ -61,7 +61,7 @@ module Fluent::Plugin
       @headers = retrieve_headers(conf)
 
       @http_client = Fluent::Plugin::HttpClient.new(
-        @endpoint_url, @verify_ssl, @headers, 
+        @endpoint_url, @verify_ssl, @headers, @statuses, 
         @open_timeout, @read_timeout, @log)
     end
 
@@ -90,20 +90,8 @@ module Fluent::Plugin
         data << record
       end
 
-      begin
-        @last_request_time = Time.now.to_f
-
-        response = @http_client.post(JSON.dump(data))
-        puts(response.to_s)  
-
-        if @statuses.include? response.code.to_i
-          # Raise an exception so that fluent will retry based on the configurations.
-          fail "Server returned bad status: #{response.code}. #{response.to_s}"
-        end
-
-      rescue EOFError, SystemCallError, OpenSSL::SSL::SSLError => e
-        @log.warn "http post raises exception: #{e.class}, '#{e.message}'"
-      end
+      @last_request_time = Time.now.to_f
+      @http_client.post(JSON.dump(data))
     end
   end
 end

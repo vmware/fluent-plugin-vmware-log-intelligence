@@ -4,8 +4,9 @@
 module Fluent::Plugin
   class HttpClient
     def initialize(endpoint_url, verify_ssl, 
-      headers, open_timeout, read_timeout, log)
+      headers, statuses, open_timeout, read_timeout, log)
       @log = log
+      @statuses = statuses
       @options = {}
 
       if !verify_ssl
@@ -44,12 +45,22 @@ module Fluent::Plugin
         return
       end
 
-      response = @conn.post(@endpoint_path, @options.merge(:body => data))
-      if (response.code == 429)
-        @log.warn('1GB quota of free account has been reached. Will stop sending data for 1 hour.')
-        @last_429_time = Time.new
-      else
-        @last_429_time = nil
+      begin
+        response = @conn.post(@endpoint_path, @options.merge(:body => data))
+        if (response.code == 429)
+          @log.warn('1GB quota of free account has been reached. Will stop sending data for 1 hour.')
+          @last_429_time = Time.new
+        else
+          @last_429_time = nil
+        end
+        
+        if @statuses.include? response.code.to_i
+          # Raise an exception so that fluent will retry based on the configurations.
+          fail "Server returned bad status: #{response.code}. #{response.to_s}"
+        end
+
+      rescue EOFError, SystemCallError, OpenSSL::SSL::SSLError => e
+        @log.warn "http post raises exception: #{e.class}, '#{e.message}'"
       end
     end
 
