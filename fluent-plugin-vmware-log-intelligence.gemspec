@@ -38,7 +38,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_dependency "fluentd", ">= 0.14.20"
-  s.add_dependency "http", ">= 3.0.0"
+  s.add_dependency "http", ">= 0.9.8"
   s.add_development_dependency "rake", ">= 0.9.2"
   s.add_development_dependency "bundler", ">= 1.3.4"
   s.add_development_dependency 'test-unit', '~> 3.1.0'
