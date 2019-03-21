@@ -47,6 +47,7 @@ module Fluent::Plugin
 
       begin
         response = @conn.post(@endpoint_path, @options.merge(:body => data))
+        response.body.to_s
         if (response.code == 429)
           @log.warn('1GB quota of free account has been reached. Will stop sending data for 1 hour.')
           @last_429_time = Time.new
