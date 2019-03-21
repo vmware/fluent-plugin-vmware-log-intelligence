@@ -14,11 +14,6 @@ Ruby version: 2.2 or above
 
 `gem install fluent-plugin-vmware-log-intelligence-1.0.0.gem`
 
-== Payload format
-VMware Log Intelligence expects the body of the HTTP requests you send to be in JSON format. It also expects the JSON payload to have a `text` field that contains your raw log text.
-
-The fluentd way of turning raw log text into a JSON is to use the 'JSON formatter plugin' (https://docs.fluentd.org/v0.12/articles/formatter_json). The plugin uses a `tag` field to store the text of a log. One configuration option of the JSON formatter plugin is called `tag_key`. You need to set `tag_key` to `text` so that the JSON formatter will generate JSON payloads that conform to what VMware Log Intelligence expects.
-
 == Usage
 vmware_log_intelligence does not support Fluentd v0.12 style configurations.
 Please use Fluentd v1.0 style configurations when working with the plugin.
@@ -39,11 +34,20 @@ Here is an example of the vmware_log_intelligence plugin configurations:
       flush_interval 3s
       retry_max_times 3
     </buffer>
+    <format>
+      @type json
+      tag_key text
+    </format>
   </match>
 
 You can find more configuration examples in the files under the examples folder.
 
 Besides Fluentd, you can also use the plugin with td-agent.
+
+== Payload format
+VMware Log Intelligence expects the body of the HTTP requests you send to be in JSON format. It also expects the JSON payload to have a 'text' field that contains your raw log text.
+
+The fluentd way of turning raw log text into a JSON is to use the JSON formatter plugin (https://docs.fluentd.org/v0.12/articles/formatter_json). The plugin uses a 'tag' field to store the text of a log. One configuration option of the JSON formatter plugin is called 'tag_key'. You need to set 'tag_key' to 'text' so that the JSON formatter will generate JSON payloads that conform to what VMware Log Intelligence expects.
 
 == Configuration
 
