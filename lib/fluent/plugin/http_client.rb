@@ -31,7 +31,7 @@ module Fluent::Plugin
 
     def check_quota
       if @last_429_time
-        if (Time.new - @last_429_time) < 3600
+        if (Time.new - @last_429_time) < 600
           return false
         end
 
