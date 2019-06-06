@@ -16,6 +16,13 @@ module Fluent::Plugin
     # config_param :use_ssl, :bool, :default => false
     config_param :verify_ssl, :bool, :default => true
     config_param :rate_limit_msec, :integer, :default => 0
+    # Keys from log event whose values should be added as log message/text
+    # to log-intelligence. Note these key/value pairs  won't be added as metadata/fields
+    config_param :log_text_keys, :array, default: ["log", "message", "msg"], value_type: :string
+    # Flatten hashes to create one key/val pair w/o losing log data
+    config_param :flatten_hashes, :bool, :default => true
+    # Seperator to use for joining flattened keys
+    config_param :flatten_hashes_separator, :string, :default => "_"
 
     config_section :buffer do
       config_set_default :@type, "memory"
@@ -51,17 +58,95 @@ module Fluent::Plugin
       headers
     end
 
+    def shorten_key(key)
+      # LINT doesn't allow some characters in field 'name'
+      # like '/', '-', '\', '.', etc. so replace them with @flatten_hashes_separator
+      key = key.gsub(/[\/\.\-\\]/,@flatten_hashes_separator).downcase
+      key
+    end
+
+    def create_lint_event(record)
+      puts record
+      flattened_records = {}
+      merged_records = {}
+      if @flatten_hashes
+        flattened_records = flatten_record(record, [])
+      else
+        flattened_records = record
+      end
+
+      puts flattened_records
+
+      keys = []
+      log = ''
+      flattened_records.each do |key, value|
+        begin
+          next if value.nil?
+          # LINT doesn't support duplicate fields, make unique names by appending underscore
+          key = shorten_key(key)
+          if keys.include?(key)
+            value = merged_records[key] + " " + value
+          end
+          keys.push(key)
+          key.force_encoding("utf-8")
+
+        end
+        if @log_text_keys.include?(key)
+          if log != "#{value}"
+            if log.empty?
+              log = "#{value}"
+            else
+              log += " #{value}"
+            end
+          end
+        else
+          merged_records[key] = value
+        end
+      end
+      merged_records["text"] = log
+
+      if log.nil? || log == "\\n" || log.empty?
+        {}
+      else
+        merged_records
+      end
+    end
+
+    def flatten_record(record, prefix=[])
+      ret = {}
+
+      case record
+      when Hash
+        record.each do |key, value|
+          if @log_text_keys.include?(key)
+            ret.merge!({key.to_s => value})
+          else
+            ret.merge! flatten_record(value, prefix + [key.to_s])
+          end
+        end
+      when Array
+        record.each do |value|
+          ret.merge! flatten_record(value, prefix)
+        end
+      else
+        return {prefix.join(@flatten_hashes_separator) => record}
+      end
+      ret
+    end
+
+
+
     def configure(conf)
       super
       validate_uri(@endpoint_url)
-      
+
       @statuses = @http_retry_statuses.split(',').map { |status| status.to_i }
       @statuses = [] if @statuses.nil?
 
       @headers = retrieve_headers(conf)
 
       @http_client = Fluent::Plugin::HttpClient.new(
-        @endpoint_url, @verify_ssl, @headers, @statuses, 
+        @endpoint_url, @verify_ssl, @headers, @statuses,
         @open_timeout, @read_timeout, @log)
     end
 
@@ -87,7 +172,7 @@ module Fluent::Plugin
 
       data = []
       chunk.each do |time, record|
-        data << record
+        data << create_lint_event(record)
       end
 
       @last_request_time = Time.now.to_f
