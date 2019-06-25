@@ -66,7 +66,6 @@ module Fluent::Plugin
     end
 
     def create_lint_event(record)
-      puts record
       flattened_records = {}
       merged_records = {}
       if @flatten_hashes
@@ -74,8 +73,6 @@ module Fluent::Plugin
       else
         flattened_records = record
       end
-
-      puts flattened_records
 
       keys = []
       log = ''
@@ -133,9 +130,6 @@ module Fluent::Plugin
       end
       ret
     end
-
-
-
     def configure(conf)
       super
       validate_uri(@endpoint_url)
