@@ -100,13 +100,11 @@ module Fluent::Plugin
           merged_records[key] = value
         end
       end
-      merged_records["text"] = log
 
-      if log.nil? || log == "\\n" || log.empty?
-        {}
-      else
-        merged_records
+      if !(log.nil? || log == "\\n" || log.empty?)
+        merged_records["text"] = log
       end
+      merged_records
     end
 
     def flatten_record(record, prefix=[])
