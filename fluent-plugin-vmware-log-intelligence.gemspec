@@ -39,6 +39,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency "fluentd", ">= 0.14.20"
   s.add_dependency "http", ">= 0.9.8"
+  s.add_dependency "myslog", "~> 0.0"
+  s.add_dependency "fluent-plugin-mysqlslowquery", ">= 0.0.9"
   s.add_development_dependency "rake", ">= 0.9.2"
   s.add_development_dependency "bundler", ">= 1.3.4"
   s.add_development_dependency 'test-unit', '~> 3.1.0'

@@ -118,12 +118,6 @@ class LogIntelligenceOutputTest < Test::Unit::TestCase
     verify_write(input, output)
   end
 
-  def test_json_with_empty_message
-    input = {"host" => "192.168.0.1", "properties" => {"type" => "windows"}, "log" => ""}
-    output = [{}]
-    verify_write(input, output)
-  end
-
   def verify_write(input, output)
     config = %[
      endpoint_url  http://localhost:9200/li
