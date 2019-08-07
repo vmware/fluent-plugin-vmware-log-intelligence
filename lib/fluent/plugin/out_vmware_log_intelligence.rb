@@ -102,7 +102,7 @@ module Fluent::Plugin
       end
       merged_records["text"] = log
 
-      if log.nil? || log == "\\n" || log.empty?
+      if log == "\\n"
         {}
       else
         merged_records
