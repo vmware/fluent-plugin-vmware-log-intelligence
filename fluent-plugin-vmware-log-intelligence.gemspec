@@ -45,4 +45,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "bundler", ">= 1.3.4"
   s.add_development_dependency 'test-unit', '~> 3.1.0'
   s.add_development_dependency 'webmock', '~> 3.4.0'
+  s.add_development_dependency 'fluent-plugin-detect-exceptions', '>= 0.0.12'
+  s.add_development_dependency 'fluent-plugin-concat', '>= 2.0.0'
+  s.add_development_dependency 'fluent-plugin-kubernetes_metadata_filter', '>= 2.0.0'
+  s.add_development_dependency 'fluent-plugin-multi-format-parser', '>= 1.0.0'
 end
