@@ -49,4 +49,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'fluent-plugin-concat', '>= 2.0.0'
   s.add_development_dependency 'fluent-plugin-kubernetes_metadata_filter', '>= 2.0.0'
   s.add_development_dependency 'fluent-plugin-multi-format-parser', '>= 1.0.0'
+  s.add_development_dependency 'fluent-plugin-postgresql', '>= 0.0.1'
 end
