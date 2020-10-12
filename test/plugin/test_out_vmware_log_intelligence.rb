@@ -68,6 +68,26 @@ class LogIntelligenceOutputTest < Test::Unit::TestCase
     end
   end
 
+  def test_json_with_special_char1
+    $log = Logger.new(STDOUT)
+    $log.level = Logger::DEBUG
+    input = {"host" => "192.168.0.1", "log" => "2019-12-02 02:04:13.556787 I | mvcc: finished scheduled compaction at 2259 (took 822.573\xC2\xB5s)"}
+    output = [{"host" => "192.168.0.1", "text" => "2019-12-02 02:04:13.556787 I | mvcc: finished scheduled compaction at 2259 (took 822.573\xC2\xB5s)"}]
+    $log.debug("INPUT: #{input}")
+    $log.debug("OUTPUT: #{output}")
+    verify_write(input, output)
+  end
+  
+  def test_json_with_special_char2
+    $log = Logger.new(STDOUT)
+    $log.level = Logger::DEBUG
+    input = {"host" => "192.168.0.1", "log" => "2019-12-02 02:04:13.556787 I | mvcc: finished scheduled compaction at 2259 (took 678.559µs)"}
+    output = [{"host" => "192.168.0.1", "text" => "2019-12-02 02:04:13.556787 I | mvcc: finished scheduled compaction at 2259 (took 678.559µs)"}]
+    $log.debug("INPUT: #{input}")
+    $log.debug("OUTPUT: #{output}")
+    verify_write(input, output)
+  end
+
   def test_json_with_log
     input = {"host" => "192.168.0.1", "log" => "machine reboot"}
     output = [{"host" => "192.168.0.1", "text" => "machine reboot"}]
