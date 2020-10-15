@@ -87,7 +87,11 @@ module Fluent::Plugin
           keys.push(key)
           key.force_encoding("utf-8")
 
+          if value.is_a?(String) 
+            value.force_encoding("utf-8")
+          end
         end
+
         if @log_text_keys.include?(key)
           if log != "#{value}"
             if log.empty?
