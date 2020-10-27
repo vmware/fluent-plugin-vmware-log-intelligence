@@ -2,6 +2,8 @@
 # Copyright 2018 VMware, Inc.
 # SPDX-License-Identifier: MIT
 
+	
+require 'zlib'
 require "fluent/plugin/output"
 require "fluent/plugin/http_client"
 
@@ -9,6 +11,7 @@ module Fluent::Plugin
   class LogIntelligenceOutput < Output
     Fluent::Plugin.register_output('vmware_log_intelligence', self)
 
+    config_param :http_compress, :bool, :default => false
     config_param :endpoint_url, :string
     config_param :http_retry_statuses, :string, default: ''
     config_param :read_timeout, :integer, default: 60
@@ -51,11 +54,19 @@ module Fluent::Plugin
     def retrieve_headers(conf)
       headers = {}
       conf.elements.each do |element|
+        if @http_compress
+          set_gzip_header(element)
+        end
         if element.name == 'headers'
           headers = element.to_hash
         end
       end
       headers
+    end
+
+    def set_gzip_header(element)
+      element['Content-Encoding'] = 'gzip'
+      element
     end
 
     def shorten_key(key)
@@ -134,6 +145,7 @@ module Fluent::Plugin
       end
       ret
     end
+
     def configure(conf)
       super
       validate_uri(@endpoint_url)
@@ -171,9 +183,15 @@ module Fluent::Plugin
       chunk.each do |time, record|
         data << create_lint_event(record)
       end
-
-      @last_request_time = Time.now.to_f
-      @http_client.post(JSON.dump(data))
+    
+      if @http_compress
+        gzip_body = Zlib::GzipWriter.new(StringIO.new)
+        gzip_body << data.to_json
+        @http_client.post(gzip_body.close.string)
+      else  
+        @last_request_time = Time.now.to_f
+        @http_client.post(JSON.dump(data))
+      end
     end
   end
 end
