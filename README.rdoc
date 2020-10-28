@@ -24,6 +24,7 @@ Here is an example of the vmware_log_intelligence plugin configurations:
     @type vmware_log_intelligence
     endpoint_url https://data.upgrade.symphony-dev.com/le-mans/v1/streams/ingestion-pipeline-stream
     verify_ssl false
+    http_compress false
     <headers>
       Content-Type application/json
       Authorization Bearer Your-VMware-Log-Intelligence-API-Token
@@ -59,6 +60,9 @@ https://data.upgrade.symphony-dev.com/le-mans/v1/streams/ingestion-pipeline-stre
 You can use this setting to control whether the vmware_log_intelligence plugin should verify
 the SSL certificate of the endpoint_url. You should always set this to `true` except in testing
 or troubleshooting.
+
+=== http_compress
+You can use this setting to compress the data while sending it to vRealize Log Insight Cloud. The default value is set 'false' here, If needed you can set it 'true'.   
 
 === <headers>
 In order to send logs to VMware Log Intelligence, you need to have the `<headers>`
