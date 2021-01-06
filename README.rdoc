@@ -31,10 +31,13 @@ Here is an example of the vmware_log_intelligence plugin configurations:
       structure simple
     </headers>
     <buffer>
-      chunk_limit_records 300
-      flush_interval 3s
-      retry_max_times 3
-    </buffer>
+        @type file
+        path /path/to/buffer/lint.buf
+        chunk_limit_records 300
+        flush_interval 20s
+        delayed_commit_timeout 120s
+        retry_max_times 3
+      </buffer>
     <format>
       @type json
       tag_key text
