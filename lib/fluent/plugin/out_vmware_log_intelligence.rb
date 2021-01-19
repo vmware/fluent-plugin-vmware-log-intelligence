@@ -13,6 +13,7 @@ module Fluent::Plugin
 
     config_param :http_compress, :bool, :default => false
     config_param :endpoint_url, :string
+    config_param :bearer_token, :string, default: ''
     config_param :http_retry_statuses, :string, default: ''
     config_param :read_timeout, :integer, default: 60
     config_param :open_timeout, :integer, default: 60
@@ -58,6 +59,9 @@ module Fluent::Plugin
           set_gzip_header(element)
         end
         if element.name == 'headers'
+          if @bearer_token != ''
+            element['Authorization'] = 'Bearer ' + @bearer_token
+          end
           headers = element.to_hash
         end
       end
