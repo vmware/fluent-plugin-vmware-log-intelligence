@@ -15,4 +15,5 @@ RUN gem install bundler && bundle install --jobs 20 --retry 5
 RUN gem install fluent-plugin-vmware-log-intelligence
 RUN gem list
 
-RUN find ! -name 'dev-docker-build.sh' ! -name 'dev-docker-run.sh' ! -name '*.gem' -delete
+WORKDIR /
+RUN rm -rf /app
