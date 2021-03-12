@@ -14,3 +14,6 @@ RUN gem build fluent-plugin-vmware-log-intelligence.gemspec
 RUN gem install bundler && bundle install --jobs 20 --retry 5
 RUN gem install fluent-plugin-vmware-log-intelligence
 RUN gem list
+
+WORKDIR /
+RUN rm -rf /app
