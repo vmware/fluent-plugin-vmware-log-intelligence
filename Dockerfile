@@ -1,7 +1,5 @@
-FROM symphony-docker-local.artifactory.eng.vmware.com/vmware/lint-base-openjdk-11.0.13:photon-3.0-20220301-openjdk-11.0.13
-
+FROM photon:3.0-20200424
 USER root
-
 RUN tdnf distro-sync --refresh -y \
     && tdnf install -y \
     rubygem-fluentd-1.6.3 \
@@ -20,27 +18,19 @@ RUN tdnf distro-sync --refresh -y \
     rubygem-fluent-plugin-concat-2.4.0 \
     rubygem-fluent-plugin-kubernetes_metadata_filter-2.2.0 \
     rubygem-fluent-plugin-remote_syslog-1.0.0
-
-RUN echo "tdnf completed"
 RUN gem install fluent-plugin-docker_metadata_filter -v 0.1.3
-
 RUN gem install fluent-plugin-detect-exceptions
-
 RUN gem install fluent-plugin-multi-format-parser
-
 RUN ln -s /usr/lib/ruby/gems/2.5.0/bin/fluentd /usr/bin/fluentd \
     && mkdir -p /fluentd/etc /fluentd/plugins \
-    && fluentd --setup /fluentd/etc
-RUN echo "copy plugins"
+    && fluentd --setup /fluentd/etc \
+    && rmdir /fluentd/etc/plugin
 # Latest version of fluentd output plugins
 COPY ./ /fluentd/plugins/
 WORKDIR /fluentd/plugins/
 RUN gem build fluent-plugin-vmware-log-intelligence.gemspec
 RUN gem install fluent-plugin-vmware-log-intelligence
 RUN gem list
-RUN echo "gem list completed"
 ENV LD_PRELOAD="/usr/lib/libjemalloc.so.2"
-
 WORKDIR /
-RUN echo "workdir set"
 RUN rm -rf /fluentd/plugins/
