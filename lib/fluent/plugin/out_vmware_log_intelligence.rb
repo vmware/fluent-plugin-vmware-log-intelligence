@@ -164,6 +164,10 @@ module Fluent::Plugin
         @open_timeout, @read_timeout, @log)
     end
 
+    def multi_workers_ready?
+      true
+    end
+
     def start
       super
     end
