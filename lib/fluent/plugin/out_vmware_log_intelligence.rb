@@ -1,5 +1,5 @@
 # Copyright (c) 2013 ablagoev
-# Copyright 2018 VMware, Inc.
+# Copyright 2023 VMware, Inc.
 # SPDX-License-Identifier: MIT
 
 	
@@ -41,7 +41,7 @@ module Fluent::Plugin
     end
 
     def validate_uri(uri_string)
-      unless uri_string =~ /^#{URI.regexp}$/
+      unless uri_string =~ /^#{URI::DEFAULT_PARSER.make_regexp}$/
         fail Fluent::ConfigError, 'endpoint_url invalid'
       end
 
@@ -56,6 +56,7 @@ module Fluent::Plugin
       headers = {}
       conf.elements.each do |element|
         if @http_compress
+          @log.debug "VMware Log Intelligence Compression enabled"
           set_gzip_header(element)
         end
         if element.name == 'headers'
@@ -102,7 +103,8 @@ module Fluent::Plugin
           keys.push(key)
           key.force_encoding("utf-8")
 
-          if value.is_a?(String) 
+          if value.is_a?(String)
+            @log.debug "VMware Log Intelligence force encoding"
             value.force_encoding("utf-8")
           end
         end
@@ -130,7 +132,7 @@ module Fluent::Plugin
 
     def flatten_record(record, prefix=[])
       ret = {}
-
+      @log.debug "VMware Log Intelligence flattening record"
       case record
       when Hash
         record.each do |key, value|
@@ -170,10 +172,12 @@ module Fluent::Plugin
 
     def start
       super
+      @log.debug "Started VMware Log Intelligence Shipper.."
     end
 
     def shutdown
       super
+      @log.debug "Shutting Down VMware Log Intelligence Shipper.."
       begin
         @http_client.close if @http_client
       rescue
@@ -181,6 +185,7 @@ module Fluent::Plugin
     end
 
     def write(chunk)
+      @log.debug "VMware Log Intelligence writing message"
       is_rate_limited = (@rate_limit_msec != 0 and not @last_request_time.nil?)
       if is_rate_limited and ((Time.now.to_f - @last_request_time) * 1000.0 < @rate_limit_msec)
         @log.info('Dropped request due to rate limiting')
@@ -193,12 +198,15 @@ module Fluent::Plugin
       end
     
       if @http_compress
+        @log.debug "VMware Log Intelligence sending compressed message"
         gzip_body = Zlib::GzipWriter.new(StringIO.new)
-        gzip_body << data.to_json
-        @http_client.post(gzip_body.close.string)
-      else  
+        gzip_body << Yajl.dump(data)
         @last_request_time = Time.now.to_f
-        @http_client.post(JSON.dump(data))
+        @http_client.post(gzip_body.close.string)
+      else
+        @log.debug "VMware Log Intelligence sending uncompressed message"
+        @last_request_time = Time.now.to_f
+        @http_client.post(Yajl.dump(data))
       end
     end
   end

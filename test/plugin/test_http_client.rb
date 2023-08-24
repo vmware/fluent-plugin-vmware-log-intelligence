@@ -10,13 +10,13 @@ class HttpClientTest < Test::Unit::TestCase
     stub_request(:post, url).to_return(:status => [429, "User out of ingestion quota."])
   end
 
-  def test_check_quota
+  def test_quota_reached
     http_client = create_http_client()
-    assert_equal http_client.check_quota, true
+    assert_equal http_client.quota_reached, false
 
     stub_server_out_of_quota
-    http_client.post(JSON.dump(sample_record()))
-    assert_equal http_client.check_quota, false
+    http_client.post(Yajl.dump(sample_record()))
+    assert_equal http_client.quota_reached, true
   end
 
   def stub_server_unavailable(url=DEFAULT_URL)
@@ -72,7 +72,7 @@ class HttpClientTest < Test::Unit::TestCase
     http_client = create_http_client()
     stub_server_returns_500
     assert_raise RuntimeError do
-      http_client.post(JSON.dump(sample_record()))
+      http_client.post(Yajl.dump(sample_record()))
     end
   end
 
@@ -80,16 +80,16 @@ class HttpClientTest < Test::Unit::TestCase
     http_client = create_http_client()
     stub_server_raise_error
     assert_raise IOError do
-      http_client.post(JSON.dump(sample_record()))
+      http_client.post(Yajl.dump(sample_record()))
     end
   end
 
   def test_post_logs
     stub_post_logs
     http_client = create_http_client()
-    http_client.post(JSON.dump(sample_record()))
+    http_client.post(Yajl.dump(sample_record()))
 
     stub_post_logs
-    http_client.post(JSON.dump(sample_record()))
+    http_client.post(Yajl.dump(sample_record()))
   end
 end

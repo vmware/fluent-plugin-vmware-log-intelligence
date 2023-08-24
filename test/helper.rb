@@ -1,5 +1,5 @@
 # Copyright (c) 2013 ablagoev
-# Copyright 2018 VMware, Inc.
+# Copyright 2023 VMware, Inc.
 # SPDX-License-Identifier: MIT
 
 require 'coveralls'
